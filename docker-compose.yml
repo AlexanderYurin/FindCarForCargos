@@ -1,0 +1,30 @@
+version: '3'
+services:
+  postgres_db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: data
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  web-app:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    environment:
+        - DB_NAME=comic
+        - DB_USER=root
+        - DB_PASSWORD=root
+        - DB_HOST=postgres_db
+        - DB_PORT=5432
+
+    volumes:
+      - .:/app
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - postgres_db
