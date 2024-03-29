@@ -31,19 +31,18 @@ class Location(models.Model):
 	lng = models.DecimalField(max_digits=9, decimal_places=6)
 
 	def __str__(self):
-		return f"{self.city}, {self.state_name}"
+		return f"{self.zip}"
 
 
 class Cargo(models.Model):
 	pick_up = models.ForeignKey(to="Location", on_delete=models.PROTECT, related_name="cargo_pick_up")
 	delivery = models.ForeignKey(to="Location", on_delete=models.PROTECT, related_name="cargo_delivery")
-	car = models.ForeignKey(to="Car", on_delete=models.PROTECT, null=True, blank=True)
 	weight = models.IntegerField(default=1, validators=[MinValueValidator(limit_value=1),
 														MaxValueValidator(limit_value=1000)])
-	description = models.TextField(max_length=500)
+	description = models.TextField(max_length=500, null=True, blank=True)
 
 	def __str__(self):
-		return f"Машина: {self.car.number}. Груз из {self.pick_up} в {self.delivery}"
+		return f"Груз из {self.pick_up} в {self.delivery}"
 
 
 class Car(models.Model):

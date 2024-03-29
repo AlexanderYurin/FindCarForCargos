@@ -1,6 +1,6 @@
 version: '3'
 services:
-  postgres_db:
+  postgres:
     image: postgres:latest
     environment:
       POSTGRES_DB: data
@@ -8,23 +8,29 @@ services:
       POSTGRES_PASSWORD: root
     ports:
       - "5432:5432"
-    volumes:
-      - ./postgres_data:/var/lib/postgresql/data
 
-  web-app:
+  service:
     build:
       context: .
     ports:
       - "8000:8000"
-    environment:
-        - DB_NAME=comic
-        - DB_USER=root
-        - DB_PASSWORD=root
-        - DB_HOST=postgres_db
-        - DB_PORT=5432
-
-    volumes:
-      - .:/app
     command: sh -c "python manage.py runserver 0.0.0.0:8000"
     depends_on:
-      - postgres_db
+      - postgres
+  redis:
+    image: redis:latest
+    hostname: redis
+    volumes:
+      - ./redis:/var/lib/redis/data
+
+  worker:
+    build:
+      context: .
+    hostname: worker
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    links:
+      - redis
+    depends_on:
+      - postgres
+      - redis
