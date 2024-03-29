@@ -7,7 +7,7 @@ from app.models import Location
 class Command(BaseCommand):
 
 	def handle(self, *args, **kwargs):
-		file_path = "./data_location/uszips.csv"
+		file_path = "app/data_location/uszips.csv"
 		with open(file_path, "r", encoding="utf-8") as file:
 			reader = csv.DictReader(file)
 			for row in reader:
