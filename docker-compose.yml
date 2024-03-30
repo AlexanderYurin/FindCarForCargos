@@ -1,7 +1,7 @@
 version: '3'
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:14-alpine
     environment:
       POSTGRES_DB: data
       POSTGRES_USER: root
@@ -15,22 +15,14 @@ services:
     ports:
       - "8000:8000"
     command: sh -c "python manage.py runserver 0.0.0.0:8000"
-    depends_on:
-      - postgres
-  redis:
-    image: redis:latest
-    hostname: redis
+    environment:
+      - DB_NAME=data
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_HOST=postgres
+      - DB_PORT=5432
     volumes:
-      - ./redis:/var/lib/redis/data
-
-  worker:
-    build:
-      context: .
-    hostname: worker
-    entrypoint: celery
-    command: -A celery_app.app worker --loglevel=info
-    links:
-      - redis
+      - ./service:/service
     depends_on:
       - postgres
-      - redis
+

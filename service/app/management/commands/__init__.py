@@ -1,0 +1,1 @@
+from .load_locations import Command
