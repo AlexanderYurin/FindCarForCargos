@@ -24,12 +24,12 @@ class CargoSerializers(serializers.ModelSerializer):
 		read_only_fields = ("pick_up", "delivery")
 
 	def get_cars(self, obj):
+		miles = int(self.context["miles"])
 		point_cargo = (obj.pick_up.lat, obj.pick_up.lng)
 		all_cars = self.context["all_cars"]
 		nearest_cars = list(filter(lambda x: distance(
-			point_cargo, (x.current_location.lat, x.current_location.lng)).miles <= 450,
+			point_cargo, (x.current_location.lat, x.current_location.lng)).miles <= miles,
 								   all_cars))
-
 		if not nearest_cars:
 			return "Нет машин поблизости!"
 		serializer = CarSerializers(nearest_cars, many=True)

@@ -63,6 +63,8 @@ http://localhost:8000/api/v1/
 - Редактирование машины по ID http://localhost:8000/api/v1/car/{car_id}
 - Редактирование груза по ID http://localhost:8000/api/v1/cargo/{cargo_id}
 - Удаление груза по ID http://localhost:8000/api/v1/cargo/{cargo_id}
+- Фильтрация по весу ближайших машин и расстоянием в милях
+http://localhost:8000/api/v1/cargo/?miles={miles}&weight={weight}
 
 
 

@@ -74,9 +74,16 @@ class CargoViewSet(GenericViewSet):
 
 	def get_serializer_context(self):
 		context = super().get_serializer_context()
-		context["all_cars"] = Car.objects.prefetch_related(
+		weight = self.request.query_params.get("weight", None)
+		all_cars = Car.objects.prefetch_related(
 			Prefetch("current_location", queryset=Location.objects.all().only("lng", "lat"))
 		)
+		if weight:
+			all_cars = all_cars.filter(weight__gte=int(weight))
+		context["all_cars"] = all_cars
+
+		context["miles"] = self.request.query_params.get("miles", 450)
+
 		return context
 
 
