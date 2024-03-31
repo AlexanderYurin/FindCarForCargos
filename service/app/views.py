@@ -1,15 +1,19 @@
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from app.models import Cargo, Car
+from app.models import Cargo, Car, Location
 from app.serializers import CargoSerializers, CarSerializers
 
 
 class CargoViewSet(GenericViewSet):
-	queryset = Cargo.objects.prefetch_related("pick_up", "delivery")
+	queryset = cargos = Cargo.objects.prefetch_related(
+		Prefetch("pick_up", queryset=Location.objects.all().only("zip", "lat", "lng")),
+		Prefetch("delivery", queryset=Location.objects.all().only("zip", "lat", "lng")),
+	)
 	serializer_class = CargoSerializers
 
 	def list(self, request) -> Response:
@@ -68,8 +72,14 @@ class CargoViewSet(GenericViewSet):
 		cargo.delete()
 		return Response(status=status.HTTP_204_NO_CONTENT)
 
+	def get_serializer_context(self):
+		context = super().get_serializer_context()
+		context["all_cars"] = Car.objects.prefetch_related(
+			Prefetch("current_location", queryset=Location.objects.all().only("lng", "lat"))
+		)
+		return context
+
 
 class CarViewSet(UpdateModelMixin, GenericViewSet):
-	queryset = Car.objects.select_related("current_location")
+	queryset = Car.objects.all().only("current_location", "weight")
 	serializer_class = CarSerializers
-

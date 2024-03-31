@@ -25,7 +25,7 @@ class CargoSerializers(serializers.ModelSerializer):
 
 	def get_cars(self, obj):
 		point_cargo = (obj.pick_up.lat, obj.pick_up.lng)
-		all_cars = Car.objects.select_related("current_location")
+		all_cars = self.context["all_cars"]
 		nearest_cars = list(filter(lambda x: distance(
 			point_cargo, (x.current_location.lat, x.current_location.lng)).miles <= 450,
 								   all_cars))
